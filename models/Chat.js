@@ -1,10 +1,11 @@
-const { db } = require('../config/db'); // Pastikan Anda sudah mengatur konfigurasi database MySQL
+const { db } = require("../config/db"); // Pastikan Anda sudah mengatur konfigurasi database MySQL
 
 const Chat = {
   // Send a message
   sendMessage: (sender_id, receiver_id, message) => {
-    const query = 'INSERT INTO chats (sender_id, receiver_id, message, sent_at) VALUES (?, ?, ?, NOW())';
-    
+    const query =
+      "INSERT INTO chats (sender_id, receiver_id, message, sent_at) VALUES (?, ?, ?, NOW())";
+
     return new Promise((resolve, reject) => {
       db.query(query, [sender_id, receiver_id, message], (err, results) => {
         if (err) {
@@ -22,26 +23,31 @@ const Chat = {
       WHERE (sender_id = ? AND receiver_id = ?)
       OR (sender_id = ? AND receiver_id = ?)
     `;
-    
+
     return new Promise((resolve, reject) => {
-      db.query(query, [user1_id, user2_id, user2_id, user1_id], (err, results) => {
-        if (err) {
-          return reject(err);
+      db.query(
+        query,
+        [user1_id, user2_id, user2_id, user1_id],
+        (err, results) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(results);
         }
-        resolve(results);
-      });
+      );
     });
   },
 
   // Get all messages for a user (from both sender and receiver perspectives)
-  getAllMessagesForUser: (user_id) => {
+  getAllMessagesForUser: (userId) => {
     const query = `
-      SELECT * FROM chats
-      WHERE sender_id = ? OR receiver_id = ?
+      SELECT * FROM messages 
+      WHERE sender_id = ?
+      ORDER BY created_at DESC
     `;
-    
+
     return new Promise((resolve, reject) => {
-      db.query(query, [user_id, user_id], (err, results) => {
+      db.query(query, [userId], (err, results) => {
         if (err) {
           return reject(err);
         }
